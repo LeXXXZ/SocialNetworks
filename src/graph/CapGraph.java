@@ -8,10 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * @author Your name here.
- * 
- * For the warm up assignment, you must implement your Graph in a class
- * named CapGraph.  Here is the stub file.
+ * A class which represents a graph implementation
+ * Nodes in the graph are users of social network
  *
  */
 public class CapGraph implements Graph {
