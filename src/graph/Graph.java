@@ -27,4 +27,16 @@ public interface Graph {
 	 * The returned representation ignores edge weights and 
 	 * multi-edges.  */
     public HashMap<Integer, HashSet<Integer>> exportGraph();
-} 
+
+    /**
+     * Get the number of nodes (users) in the graph
+     * @return The number of nodes in the graph.
+     */
+    public int getNumNodes();
+
+    /**
+     * Get the number of relationships of users in the graph
+     * @return The number of edges in the graph.
+     */
+    public int getNumEdges();
+}
