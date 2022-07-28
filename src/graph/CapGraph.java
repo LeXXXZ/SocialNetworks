@@ -59,8 +59,23 @@ public class CapGraph implements Graph {
 	 */
 	@Override
 	public Graph getEgonet(int center) {
-		// TODO Auto-generated method stub
-		return null;
+		Graph result = new CapGraph();
+		if (nodes.containsKey(center)) {
+			CapNode centerNode = nodes.get(center);
+			result.addVertex(center);
+			Set<CapNode> centerNodeNeighbors = centerNode.getNeighbors();
+			for (CapNode node : centerNodeNeighbors) {
+				result.addVertex(node.getId());
+				result.addEdge(centerNode.getId(), node.getId());
+				for (CapNode secondNeighbor : node.getNeighbors()) {
+					if (!secondNeighbor.equals(centerNode) && centerNodeNeighbors.contains(secondNeighbor)) {
+						result.addVertex(secondNeighbor.getId());
+						result.addEdge(node.getId(), secondNeighbor.getId());
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
