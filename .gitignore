@@ -1,2 +1,4 @@
 /.idea/
 /bin/
+/lib/*-sources.jar
+/lib/*-javadoc.jar
