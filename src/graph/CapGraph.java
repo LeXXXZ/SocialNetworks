@@ -54,6 +54,10 @@ public class CapGraph implements Graph {
 
 	}
 
+	private CapNode getNodeById(Integer id) {
+		return nodes.get(id);
+	}
+
 	/* (non-Javadoc)
 	 * @see graph.Graph#getEgonet(int)
 	 */
@@ -83,8 +87,63 @@ public class CapGraph implements Graph {
 	 */
 	@Override
 	public List<Graph> getSCCs() {
-		// TODO Auto-generated method stub
-		return null;
+		//First step - get finished stack of nodes after DFS
+		Deque<CapNode> originalGraphCapNodes = new ArrayDeque<>(this.getNodes());
+		Set<CapNode> visitedOriginalGraphCapNodes = new HashSet<>();
+		Deque<CapNode> firstDfsFinishedNodes = new ArrayDeque<>();
+		while (!originalGraphCapNodes.isEmpty()) {
+			performDfsCycle(originalGraphCapNodes, visitedOriginalGraphCapNodes, firstDfsFinishedNodes);
+		}
+
+		//Second step - transpose original graph
+		CapGraph transposedGraph = transpose(this);
+
+		//Third step - perform DFS with transposed graph and form SCCs
+		Deque<CapNode> transposedGraphCapNodes = new ArrayDeque<>();
+		while (!firstDfsFinishedNodes.isEmpty()) {
+			transposedGraphCapNodes.addLast(transposedGraph.getNodeById(firstDfsFinishedNodes.pop().getId()));
+		}
+
+		Set<CapNode> visitedTransposedGraphCapNodes = new HashSet<>();
+		List<Graph> sccs = new ArrayList<>();
+
+		while (!transposedGraphCapNodes.isEmpty()) {
+			Deque<CapNode> secondDfsFinishedNodes  = new ArrayDeque<>();
+			performDfsCycle(transposedGraphCapNodes, visitedTransposedGraphCapNodes, secondDfsFinishedNodes);
+			if (!secondDfsFinishedNodes .isEmpty()) {
+				CapGraph graph = new CapGraph();
+				secondDfsFinishedNodes .forEach(n -> graph.addVertex(n.getId()));
+				secondDfsFinishedNodes .forEach(n -> {
+					n.getEdges().forEach(edge -> graph.addEdge(edge.getEnd().getId(), edge.getStart().getId()));
+				});
+				sccs.add(graph);
+			}
+		}
+		return sccs;
+	}
+
+	private void performDfsCycle(Deque<CapNode> capNodes, Set<CapNode> visited, Deque<CapNode> finished) {
+		CapNode currentNode = capNodes.pop();
+		if (!visited.contains(currentNode)){
+			dfsVisit(currentNode, visited, finished);
+		}
+	}
+
+	private void dfsVisit(CapNode node, Set<CapNode> visited, Deque<CapNode> finished) {
+		visited.add(node);
+		for (CapNode neighbor : node.getNeighbors()) {
+			if (!visited.contains(neighbor)){
+				dfsVisit(neighbor, visited, finished);
+			}
+		}
+		finished.push(node);
+	}
+
+	private CapGraph transpose(CapGraph graph) {
+		CapGraph transposedGraph = new CapGraph();
+		graph.getNodes().forEach(n -> transposedGraph.addVertex(n.getId()));
+		graph.getEdges().forEach(edge -> transposedGraph.addEdge(edge.getEnd().getId(), edge.getStart().getId()));
+		return transposedGraph;
 	}
 
 	/* (non-Javadoc)
@@ -108,9 +167,9 @@ public class CapGraph implements Graph {
 	 * Return the user ids, which are the nodes in this graph.
 	 * @return The nodes in this graph as user ids
 	 */
-	private Set<Integer> getNodes()
+	private Collection<CapNode> getNodes()
 	{
-		return nodes.keySet();
+		return nodes.values();
 	}
 
 	@Override
@@ -122,6 +181,8 @@ public class CapGraph implements Graph {
 	private HashSet<CapEdge> getEdges() {
 		return edges;
 	}
+
+
 
 	@Override
 	public String toString() {

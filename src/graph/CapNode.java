@@ -24,6 +24,10 @@ public class CapNode {
         return id;
     }
 
+    public HashSet<CapEdge> getEdges() {
+        return edges;
+    }
+
     /**
      * Add an edge that is outgoing from this node in the graph
      * @param edge The edge to be added
